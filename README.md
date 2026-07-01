@@ -182,6 +182,14 @@ The arena is enclosed by four fixed walls (bottom / left / right / top) that pus
 </tr>
 </table>
 </div>
+<div align="center">
+<table>
+<tr>
+  <td align="center" width="50%"><img src="https://github.com/user-attachments/assets/ab324a8e-1fa1-47e2-a00e-e4fd0307a27d" width="100%"/><br/><sub><b>Victory</b></sub></td>
+</tr>
+</table>
+</div>
+
 
 **Vaccine skill** (`K`, hold): Consumes MP and plays the vaccine animation around the player. If MP drops below 50, Armor HP begins to drain — and HP directly after that — creating a resource-management trade-off.
 

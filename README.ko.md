@@ -180,6 +180,13 @@
 </tr>
 </table>
 </div>
+<div align="center">
+<table>
+<tr>
+  <td align="center" width="50%"><img src="https://github.com/user-attachments/assets/ab324a8e-1fa1-47e2-a00e-e4fd0307a27d" width="100%"/><br/><sub><b>승리</b></sub></td>
+</tr>
+</table>
+</div>
 
 **백신 스킬**(`K`, 누르고 있는 동안): MP를 소모하며 플레이어 주변에 백신 애니메이션을 표시합니다. MP가 50 미만으로 떨어지면 Armor HP, 이어서 HP가 감소하기 시작하여 자원 관리의 트레이드오프를 만듭니다. **환경 위협 요소:** 스테이지 2의 몬스터를 모두 처치하면 낙하하는 바이러스 투사체("보스 레인")가 무작위 위치에서 계속 생성되며, 보스전이 끝날 때까지 접촉 시 플레이어에게 데미지를 줍니다.
 

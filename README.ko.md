@@ -1,6 +1,8 @@
 # 2002 — Virus Field Game
 <div align="center">
-<img width="600" height="350" alt="image" src="https://github.com/user-attachments/assets/af32d291-b82d-47cf-b071-be378a07759c" />
+<img width="741" height="247" alt="image" src="https://github.com/user-attachments/assets/283dfe60-bafc-4852-bdbc-d736dde36891" />
+<br>
+
 </div>
 <div align="center">
 
@@ -31,7 +33,8 @@
   - [씬(Scene) 흐름](#씬scene-흐름)
   - [플레이어 시스템](#플레이어-시스템-hp--mp--armor)
   - [1. 스테이지 1 — 지상층](#1-스테이지-1--지상층)
-  - [2. 스테이지 2 — 수직 아레나 & 보스](#2-스테이지-2--수직-아레나--보스)
+  - [2. 스테이지 2 — 수직 아레나](#2-스테이지-2--수직-아레나)
+  - [3. 스테이지 3 — 보스전](#3-스테이지-3--보스전)
 - [기술 스택](#기술-스택)
 - [프로젝트 구조](#프로젝트-구조)
 - [빌드 및 실행](#빌드-및-실행)
@@ -43,7 +46,16 @@
 
 ## 개요
 
-**2002**는 DigiPen GAM100 과목(2021년 가을학기) 텀 프로젝트로 제작된 2D 사이드뷰 액션 게임이며, 하이 콘셉트는 "바이러스 필드 게임(Virus field game)"입니다. `doodle` 2D 프레임워크로 제작되었고, 플레이어는 총 2개의 스테이지에서 바이러스 컨셉의 몬스터들과 싸우며 HP·MP·Armor 자원을 관리하고, 최종적으로 다단계 패턴을 가진 보스를 처치하면 승리합니다.
+<div align="center">
+<img width="600" height="350" alt="0" src="https://github.com/user-attachments/assets/a6a376f6-a20e-4f82-b5a1-448f2231ca6a" />
+
+<br>
+<sub><b>▲ 오프닝 · 메인 화면 미리보기</b></sub>
+</div>
+
+**2002**는 DigiPen GAM100 과목(2021년 가을학기) 텀 프로젝트로 제작된 2D 사이드뷰 액션 게임이며, 하이 콘셉트는 "바이러스 필드 게임(Virus field game)"입니다. `doodle` 2D 프레임워크로 제작되었고, 플레이어는 총 3개의 스테이지(① 지상층 → ② 수직 아레나 → ③ 보스전)를 거치며 바이러스 컨셉의 몬스터들과 싸우고 HP·MP·Armor 자원을 관리하며, 최종적으로 다단계 패턴을 가진 보스를 처치하면 승리합니다.
+
+>  엔진 내부적으로는 `current_scene == 2` 하나의 씬에서 "수직 아레나"와 "보스전"이 이어서 진행되지만, 플레이 경험상 명확히 구분되는 두 개의 구간이라 문서에서는 스테이지 2(아레나)와 스테이지 3(보스전)으로 나누어 설명합니다.
 
 ---
 
@@ -69,7 +81,7 @@
 | **D** | 우측 이동 |
 | **Space** | 점프 (게이지 방식) |
 | **J** (+ A/D) | 근접 공격 — 소드 / 사탕(캔디), 방향에 따라 다른 모션 |
-| **K** | 상황별 기능: 스테이지 1에서는 **알코올** 투사체(A/D와 조합), 두 스테이지 모두에서는 몬스터 경고 구역 내 데미지를 줄이는 **가드**, 스테이지 2에서는 **백신(Vaccine)** 스킬 |
+| **K** | 상황별 기능: 스테이지 1에서는 **알코올** 투사체(A/D와 조합), 모든 스테이지에서 몬스터 경고 구역 내 데미지를 줄이는 **가드**, 스테이지 3에서는 **백신(Vaccine)** 스킬 |
 | **L** | 원거리 **레인(Rain)** 스킬 (HP 300 초과, MP 200 초과일 때 사용 가능) |
 
 ---
@@ -85,7 +97,7 @@
 | 9 | 로고 | 시작 시 DigiPen 로고 애니메이션 재생 후 자동으로 메인 메뉴로 전환, 스테이지 1 배경음악 재생 시작 |
 | 0 | 메인 메뉴 | Start / How To Play / Credit 버튼 |
 | 1 | 스테이지 1 | 지상층 액션 스테이지 |
-| 2 | 스테이지 2 | 수직 아레나 + 보스 스테이지 |
+| 2 | 스테이지 2 & 3 | 수직 아레나(스테이지 2) + 보스전(스테이지 3)이 이어지는 구간 |
 | 3 | 게임 오버 | 플레이어 HP가 0 미만이 되면 표시, Replay 버튼으로 전체 상태 초기화 |
 | 4 | 승리 | 보스 HP가 1.1 이하가 되면 표시, Replay 버튼으로 전체 상태 초기화 |
 | 5 | 게임 방법 (1/2) | 튜토리얼 첫 페이지, Next 버튼 → 씬 6 |
@@ -98,7 +110,7 @@
 - **HP** (`playerHP_width`, 최대 360): 최대치 미만일 때 프레임당 +0.01씩 서서히 자동 회복됩니다. 0 미만이 되면 게임 오버가 발생합니다.
 - **MP** (`playerMP_width`, 최대 360): 레인 스킬(`L`)을 사용하지 않는 동안 프레임당 +0.05씩 자동 회복되며, 알코올·레인·백신 스킬 사용 시 소모됩니다.
 - **Armor HP** (`armorHP_width`, 0~300): 초기값 0이며, 맵에 있는 방어구 아이템을 획득하면 300으로 설정되고 캐릭터 스프라이트가 갑옷("warrior") 버전으로 바뀝니다. 몬스터의 "경고 구역(warning zone)"에 들어가면 가드(`K`)를 누르고 있지 않는 한 Armor HP가 감소하며, Armor HP가 소진되면 이후에는 HP가 직접 감소합니다.
-- **점프 게이지** (`Jplayer_width`, 스테이지 2 전용): 시간이 지나면 최대 100까지 차오르고, `Space`를 누르고 있는 동안 프레임당 4씩 소모되며 플레이어를 위로 밀어 올립니다. 공중에 떠 있는 상태에서도 게이지가 재충전될 수 있기 때문에, `Space`를 계속 누르고 있으면 원래 의도보다 더 오래 상승할 수 있습니다(팀에서도 의도치 않은 "치트"로 문서화한 부분입니다 — [이슈 / 회고](#이슈--회고) 참고).
+- **점프 게이지** (`Jplayer_width`, 스테이지 2·3 전용): 시간이 지나면 최대 100까지 차오르고, `Space`를 누르고 있는 동안 프레임당 4씩 소모되며 플레이어를 위로 밀어 올립니다. 공중에 떠 있는 상태에서도 게이지가 재충전될 수 있기 때문에, `Space`를 계속 누르고 있으면 원래 의도보다 더 오래 상승할 수 있습니다(팀에서도 의도치 않은 "치트"로 문서화한 부분입니다 — [이슈 / 회고](#이슈--회고) 참고).
 
 ---
 
@@ -107,9 +119,9 @@
 <div align="center">
 <table>
 <tr>
-<td align="center" width="33.3%"><img src="docs/media/stage1_1.gif" width="100%"/><br/><sub><b>층 몬스터 조우</b></sub></td>
-<td align="center" width="33.3%"><img src="docs/media/stage1_2.gif" width="100%"/><br/><sub><b>소드 & 알코올 공격</b></sub></td>
-<td align="center" width="33.3%"><img src="docs/media/stage1_3.gif" width="100%"/><br/><sub><b>키 게이지 & 문 개방</b></sub></td>
+<td align="center" width="33.3%"><img src="https://github.com/user-attachments/assets/61d03188-c5d8-4a40-90a1-132d0de148cf" width="100%"/><br/><sub><b>1층 몬스터</b></sub></td>
+<td align="center" width="33.3%"><img src="https://github.com/user-attachments/assets/2b3160fc-167a-436d-ac3b-4579be51f85d" width="100%"/><br/><sub><b>2층 몬스터</b></sub></td>
+<td align="center" width="33.3%"><img src="https://github.com/user-attachments/assets/f1e36c8a-bec5-4735-a265-95af7671993f" width="100%"/><br/><sub><b>3층 몬스터</b></sub></td>
 </tr>
 </table>
 </div>
@@ -130,14 +142,14 @@
 
 ---
 
-### 2. 스테이지 2 — 수직 아레나 & 보스
+### 2. 스테이지 2 — 수직 아레나
 
 <div align="center">
 <table>
 <tr>
-<td align="center" width="33.3%"><img src="docs/media/stage2_1.gif" width="100%"/><br/><sub><b>층 몬스터 전투</b></sub></td>
-<td align="center" width="33.3%"><img src="docs/media/stage2_2.gif" width="100%"/><br/><sub><b>점프 게이지 & 보스 레인 위협</b></sub></td>
-<td align="center" width="33.3%"><img src="docs/media/stage2_3.gif" width="100%"/><br/><sub><b>보스전 — 미니보스 페이즈</b></sub></td>
+<td align="center" width="33.3%"><img src="https://github.com/user-attachments/assets/6a740057-7fdd-4219-8524-5151281b786a" width="100%"/><br/><sub><b>방어구 획득</b></sub></td>
+<td align="center" width="33.3%"><img src="https://github.com/user-attachments/assets/bc21f590-c5a7-4b89-ada3-77d50feaffe4" width="100%"/><br/><sub><b>몬스터 처치</b></sub></td>
+<td align="center" width="33.3%"><img src="https://github.com/user-attachments/assets/1599e775-d816-44f0-a4c4-ff2b2dbff3d5" width="100%"/><br/><sub><b>3스테이지 진입</b></sub></td>
 </tr>
 </table>
 </div>
@@ -146,11 +158,30 @@
 
 **4마리의 층 몬스터**(`monster1.h` ~ `monster4.h`)는 각각 독립적인 HP, 양방향 검 공격, 그리고 가드(`K`)를 누르지 않으면 Armor HP(이후 HP)를 감소시키는 "경고 구역"을 가지고 있습니다.
 
-**점프 기능**(`Space`)은 앞서 설명한 게이지 시스템을 사용합니다. **환경 위협 요소:** 4마리의 층 몬스터를 모두 처치하면 낙하하는 바이러스 투사체("보스 레인")가 무작위 위치에서 계속 생성되며, 보스전이 끝날 때까지 접촉 시 플레이어에게 데미지를 줍니다.
+**점프 기능**(`Space`)은 앞서 설명한 게이지 시스템을 사용합니다. 4마리의 층 몬스터를 모두 처치하면 감옥 오브젝트가 사라지며 스테이지 3(보스전)으로 이어집니다.
 
-**백신 스킬**(`K`, 누르고 있는 동안): MP를 소모하며 플레이어 주변에 백신 애니메이션을 표시합니다. MP가 50 미만으로 떨어지면 Armor HP, 이어서 HP가 감소하기 시작하여 자원 관리의 트레이드오프를 만듭니다.
+---
 
-#### 보스전
+### 3. 스테이지 3 — 보스전
+
+<div align="center">
+<table>
+<tr>
+<td align="center" width="50%"><img src="https://github.com/user-attachments/assets/e9427051-ca25-4757-b64f-7c8e0dbb0adb" width="100%"/><br/><sub><b>보스전 시작</b></sub></td>
+  <td align="center" width="50%"><img src="https://github.com/user-attachments/assets/0fa6b285-1336-4e3e-a311-43a872a0bcd0" width="100%"/><br/><sub><b>보스 이동 패턴</b></sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><img src="https://github.com/user-attachments/assets/4fb34336-f558-4739-b208-e2b942869036" width="100%"/><br/><sub><b>미니보스 페이즈</b></sub></td>
+<td align="center" width="50%"><img src="https://github.com/user-attachments/assets/0729ef53-68fd-4543-b49b-6391c20a547f" width="100%"/><br/><sub><b>바이러스 기둥 & 위저드</b></sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><img src="https://github.com/user-attachments/assets/78499344-c52a-44e6-a537-8ae6171fb698" width="100%"/><br/><sub><b>전환 비행 페이즈</b></sub></td>
+<td align="center" width="50%"><img src="https://github.com/user-attachments/assets/b764af3e-12e5-4000-9d0a-f3156a129b0c" width="100%"/><br/><sub><b>최종 페이즈</b></sub></td>
+</tr>
+</table>
+</div>
+
+**백신 스킬**(`K`, 누르고 있는 동안): MP를 소모하며 플레이어 주변에 백신 애니메이션을 표시합니다. MP가 50 미만으로 떨어지면 Armor HP, 이어서 HP가 감소하기 시작하여 자원 관리의 트레이드오프를 만듭니다. **환경 위협 요소:** 스테이지 2의 몬스터를 모두 처치하면 낙하하는 바이러스 투사체("보스 레인")가 무작위 위치에서 계속 생성되며, 보스전이 끝날 때까지 접촉 시 플레이어에게 데미지를 줍니다.
 
 보스(`STAGE2_BOSS`)의 HP는 800에서 시작하며, 사거리 내에서 근접 검 공격을 맞을 때마다 감소합니다.
 
@@ -235,6 +266,7 @@ gam100-2002-game/
 ---
 
 ## 크레딧
+<img width="360" height="192" alt="credit" src="https://github.com/user-attachments/assets/bf136aa9-b996-4a3e-ae52-ea43c39f0353" />
 
 | 팀원 | 역할 | 담당 내용 |
 |---|---|---|
